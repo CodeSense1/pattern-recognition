@@ -16,16 +16,15 @@ y = []
 
 def onclick(evt):
     print(f"button ({evt.button}), x=({evt.x}), y=({evt.y}), xdata=({evt.xdata}), ydata=({evt.ydata})")
-    print(type(evt.button))
+    
+    # Left mouse button
     if evt.button == 1:
         fig.clear()
         plotPoints(evt.xdata, evt.ydata)        
-        
+    
+    # Right mouse button
     elif evt.button == 3:
-        x = []
-        y = []
-        fig.canvas.clear()
-        
+        plt.close()
         
 
 def plotPoints(xdata,ydata):
@@ -38,7 +37,7 @@ def plotPoints(xdata,ydata):
 
 def drawline(x,y):
 
-    if len(x) < 2 or len(y) < 2:
+    if len(x) < 1 or len(y) < 1:
         print("x or y has too few values!")
         return
 
@@ -53,14 +52,17 @@ def drawline(x,y):
     xp = np.arange(-2,5,0.1)
     plt.plot(xp, a*xp + b, 'r-')
     plt.plot(xp, a1*xp + b2, 'g-')
+    plt.legend(["points", "My regression", "Scipy regression"])
 
 
-fig = plt.figure()
-ax = fig.add_subplot(111)
-ax.set_xlim([-2, 5])
-ax.set_ylim([-2, 5])
+def init():
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.set_xlim([-2, 5])
+    ax.set_ylim([-2, 5])
+    fig.canvas.mpl_connect('button_press_event', onclick)
+    return fig
 
 
-
-cid = fig.canvas.mpl_connect('button_press_event', onclick)
+fig = init()
 plt.show()
