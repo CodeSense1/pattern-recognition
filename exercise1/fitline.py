@@ -4,10 +4,18 @@ import numpy as np
 
 def linregress(xd,yd):
     # Define values for linear regression
-    x = np.array(xd)
-    y = np.array(yd)
-    a = (sum(x*y) - sum(y)/len(y)*sum(x)) / ((sum(x*x) + sum(x)/len(x) * sum(x)))
-    b = a*sum(x)/len(x) + sum(y) / len(y)
+    xmean = sum(xd)/len(xd)
+    ymean = sum(yd)/len(yd)
+
+    num = 0
+    den = 0
+    for x,y in zip(xd, yd):
+        num += (x-xmean)*(y-ymean)
+        den += (x-xmean) * (x-xmean)
+
+    a = float(num)/float(den)
+    b = ymean - a*xmean
+    
     return a,b
 
 # Define x,y points
@@ -18,8 +26,10 @@ def onclick(evt):
     print(f"button ({evt.button}), x=({evt.x}), y=({evt.y}), xdata=({evt.xdata}), ydata=({evt.ydata})")
     
     # Left mouse button
-    if evt.button == 1:
+    if evt.button == 1 and evt.xdata is not None and evt.ydata is not None:
         fig.clear()
+        ax.set_xlim([-2, 5])
+        ax.set_ylim([-2, 5])
         plotPoints(evt.xdata, evt.ydata)        
     
     # Right mouse button
@@ -37,32 +47,27 @@ def plotPoints(xdata,ydata):
 
 def drawline(x,y):
 
-    if len(x) < 1 or len(y) < 1:
+    if len(x) < 2 or len(y) < 2:
         print("x or y has too few values!")
         return
 
     a,b = linregress(x,y)
-    t = sp.linregress(x,y)
-    a1 = t[0]
-    b2 = t[1]
-
+    
     print(f"My fit: a = {a} and b = {b}")
-    print(f"Real regression: a = {a1} and b = {b2}")
 
     xp = np.arange(-2,5,0.1)
     plt.plot(xp, a*xp + b, 'r-')
-    plt.plot(xp, a1*xp + b2, 'g-')
-    plt.legend(["points", "My regression", "Scipy regression"])
+    plt.legend(["points", "Regression"])
 
 
 def init():
-    fig = plt.figure()
+    fig = plt.figure(figsize=(8,8))
     ax = fig.add_subplot(111)
     ax.set_xlim([-2, 5])
     ax.set_ylim([-2, 5])
     fig.canvas.mpl_connect('button_press_event', onclick)
-    return fig
+    return fig, ax
 
 
-fig = init()
+fig, ax = init()
 plt.show()
